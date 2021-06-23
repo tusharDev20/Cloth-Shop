@@ -1,0 +1,2 @@
+﻿- Used the SimpleCitizen Asset for Character which I had.
+- Character Movement from YouTube Channel "iHeartGameDev" (Video Link : "ttps://www.youtube.com/watch?v=bXNFxQpp2qk&list=PLwyUzJb_FNeQrIxCEjj5AMPwawsw5beAy&index=3").
