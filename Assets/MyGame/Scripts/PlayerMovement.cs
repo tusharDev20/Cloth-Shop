@@ -18,6 +18,11 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 movementVector;
 
     /// <summary>
+    /// Input Vetor.
+    /// </summary>
+    private Vector2 inputVector;
+
+    /// <summary>
     /// Wheather to Set Move Animation or Not.
     /// </summary>
     private bool canMove;
@@ -59,7 +64,7 @@ public class PlayerMovement : MonoBehaviour
     {
         HandleAnimation();
         HandleRotation();
-        characterController.Move(movementVector * Time.deltaTime);
+        characterController.Move(movementVector * Time.deltaTime * 2);
     }
 
     #endregion
@@ -71,9 +76,11 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     private void HandleOnMovementInput ( CallbackContext context )
     {
-        Vector2 inputVector = context.ReadValue<Vector2>();
+        inputVector = context.ReadValue<Vector2>();
         movementVector.x = inputVector.x;
+        movementVector.y = 0;
         movementVector.z = inputVector.y;
+        movementVector = transform.TransformDirection(movementVector);
         canMove = inputVector != Vector2.zero;
     }
 
@@ -83,13 +90,19 @@ public class PlayerMovement : MonoBehaviour
     private void HandleAnimation ()
     {
         bool isWalking = animator.GetBool("walking");
-        if ( !isWalking && canMove )
+        bool isWalkingBackwords = animator.GetBool("backwords");
+        if ( inputVector.y < 0 && !isWalkingBackwords && canMove )
+        {
+            animator.SetBool("backwords", true);
+        }
+        else if ( !isWalking && canMove )
         {
             animator.SetBool("walking", true);
         }
         else if ( isWalking && !canMove )
         {
             animator.SetBool("walking", false);
+            animator.SetBool("backwords", false);
         }
     }
 
@@ -99,9 +112,17 @@ public class PlayerMovement : MonoBehaviour
     private void HandleRotation ()
     {
         Vector3 positionToLookAt;
-        positionToLookAt.x = movementVector.x;
         positionToLookAt.y = 0;
-        positionToLookAt.z = movementVector.z;
+        if ( inputVector.y < 0 )
+        {
+            positionToLookAt.x = -movementVector.x;
+            positionToLookAt.z = -movementVector.z;
+        }
+        else
+        {
+            positionToLookAt.x = movementVector.x;
+            positionToLookAt.z = movementVector.z;
+        }
 
         Quaternion currentRotation = transform.rotation;
         if ( canMove )
